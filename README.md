@@ -60,7 +60,7 @@ sudo pkg install qt5-sql qt5-core qt5-help qt5-svg muparser qt5-network qt5-prin
 
 #setup
 sudo sysctl security.bsd.unprivileged_proc_debug=1
-code .
+vscode .
 #->install Beyond GDB Extension, set breakpoints, hit <F5>
 #->debug
 
