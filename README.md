@@ -52,7 +52,7 @@ git clone https://github.com/tonischranz/LibreCAD
 cd LibreCAD
 
 #tools, deps
-sudo pkg install qt5-sql qt5-core qt5-help qt5-svg muparser qt5-network qt5-printsupport qt5-gui qt5-widgets gdb code-oss
+sudo pkg install qt5-sql qt5-core qt5-help qt5-svg muparser qt5-network qt5-printsupport qt5-gui qt5-widgets gdb vscode
 
 #build
 ./CLEAN.SH
