@@ -47,8 +47,25 @@ Requirements:
 
 On FreeBSD (with debug)
 ```
-sudo pkg install qt5-sql qt5-core qt5-help qt5-svg muparser qt5-network qt5-printsupport qt5-gui qt5-widgets
+#source
+git clone https://github.com/tonischranz/LibreCAD
+cd LibreCAD
+
+#tools, deps
+sudo pkg install qt5-sql qt5-core qt5-help qt5-svg muparser qt5-network qt5-printsupport qt5-gui qt5-widgets gdb code-oss
+
+#build
+./CLEAN.SH
 /usr/local/lib/qt5/bin/qmake CONFIG+=debug QMAKE_CXXFLAGS="-I /usr/local/include" QMAKE_LIBS="-L /usr/local/lib" && make -j 6
+
+#setup
+sudo sysctl security.bsd.unprivileged_proc_debug=1
+code .
+#->install Beyond GDB Extension, set breakpoints, hit <F5>
+#->debug
+
+#teardown
+sudo sysctl security.bsd.unprivileged_proc_debug=0
 ```
 
 More information: [Build from source](https://github.com/LibreCAD/LibreCAD/wiki/Build-from-source)
