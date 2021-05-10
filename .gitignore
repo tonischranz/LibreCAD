@@ -93,3 +93,8 @@ core.*
 *.vcxproj
 *.vcxproj.filters
 *.sln
+
+#global
+/GPATH
+/GRTAGS
+/GTAGS
