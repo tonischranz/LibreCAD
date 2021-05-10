@@ -45,6 +45,12 @@ Requirements:
 - [Qt](https://www.qt.io/download-open-source/) 5.2.1+ (MinGW version on Windows)
 - [Boost](https://www.boost.org/)
 
+On FreeBSD
+```
+sudo pkg install qt5-sql qt5-core qt5-help qt5-svg muparser qt5-network qt5-printsupport qt5-gui qt5-widgets
+/usr/local/lib/qt5/bin/qmake CONFIG+=debug QMAKE_CXXFLAGS="-I /usr/local/include" QMAKE_LIBS="-L /usr/local/lib" && make -j 6
+```
+
 More information: [Build from source](https://github.com/LibreCAD/LibreCAD/wiki/Build-from-source)
 
 **Contributing**
