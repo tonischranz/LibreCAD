@@ -48,6 +48,9 @@
 #include <boost/version.hpp>
 #include <boost/math/tools/roots.hpp>
 #include <boost/math/special_functions/ellint_2.hpp>
+#if BOOST_VERSION > 104500
+#include <boost/math/tools/tuple.hpp>
+#endif
 #endif
 
 namespace{
@@ -463,7 +466,7 @@ RS_Vector  RS_Ellipse::getEllipsePoint(const double& a) const {
     return p;
 }
 
-/** \brief implemented using an analytical aglorithm
+/** \brief implemented using an analytical algorithm
 * find nearest point on ellipse to a given point
 *
 * @author Dongxu Li <dongxuli2011@gmail.com>
