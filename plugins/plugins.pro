@@ -15,10 +15,10 @@ SUBDIRS     = \
         divide \
         list \
         sameprop \
-        importshp \
         sample \
         picfile \
         plotequation \
+        pointstocsv \
         gear
 
 TRANSLATIONS = ./ts/plugins_ar.ts \

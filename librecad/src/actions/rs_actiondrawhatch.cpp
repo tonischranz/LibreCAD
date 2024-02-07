@@ -28,6 +28,7 @@
 #include <QMouseEvent>
 #include "rs_actiondrawhatch.h"
 #include "rs_dialogfactory.h"
+#include "rs_eventhandler.h"
 #include "rs_graphicview.h"
 #include "rs_information.h"
 #include "rs_hatch.h"
@@ -35,7 +36,7 @@
 
 RS_ActionDrawHatch::RS_ActionDrawHatch(RS_EntityContainer& container, RS_GraphicView& graphicView)
                                 :RS_PreviewActionInterface("Draw Hatch", container, graphicView)
-								, data{new RS_HatchData{}}
+    , data{std::make_unique<RS_HatchData>()}
 {
     actionType = RS2::ActionDrawHatch;
 }
@@ -55,12 +56,9 @@ void RS_ActionDrawHatch::init(int status) {
     if (RS_DIALOGFACTORY->requestHatchDialog(&tmp)) {
 		*data = tmp.getData();
         trigger();
-        finish(false);
         graphicView->redraw(RS2::RedrawDrawing); 
-
-    } else {
-        finish(false);
     }
+    finish(false);
 }
 
 void RS_ActionDrawHatch::trigger() {
@@ -106,7 +104,7 @@ void RS_ActionDrawHatch::trigger() {
         return;
     }
 
-	std::unique_ptr<RS_Hatch> hatch{new RS_Hatch{container, *data}};
+    std::unique_ptr<RS_Hatch> hatch=std::make_unique<RS_Hatch>(container, *data);
     hatch->setLayerToActive();
     hatch->setPenToActive();
 	RS_EntityContainer* loop = new RS_EntityContainer(hatch.get());
@@ -171,7 +169,7 @@ void RS_ActionDrawHatch::trigger() {
         }
 		if(m_bShowArea && printArea){
             RS_DIALOGFACTORY->commandMessage(tr("Total hatch area = %1").
-                                             arg(hatch->getTotalArea(),10,'g',8));
+                                             arg(hatch->getTotalArea(),12,'g',10));
         }
 
 		hatch.release();

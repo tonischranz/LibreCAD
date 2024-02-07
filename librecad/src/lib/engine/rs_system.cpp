@@ -38,7 +38,12 @@
 
 #include <QStandardPaths>
 
-RS_System* RS_System::uniqueInstance = NULL;
+
+RS_System* RS_System::instance() {
+    static RS_System* uniqueInstance = new RS_System();
+    return uniqueInstance;
+}
+
 
 /**
  * Initializes the system.
@@ -58,11 +63,14 @@ void RS_System::init(const QString& appName,
     if (QFile::decodeName( arg0).contains( "/.mount")) {
         // in AppImage QCoreApplication::applicationDirPath() directs to /lib64 of mounted AppImage
         // thus use argv[0] to extract the correct path to librecad executable
-        appDir = QFileInfo( QFile::decodeName( arg0)).absolutePath();
+        appDir = QFileInfo( QFile::decodeName( arg0)).absoluteFilePath();
+        RS_DEBUG->print("%s\n", (QString("arg0:")+ QString(arg0)).toStdString().c_str());
+        RS_DEBUG->print("%s\n", (QString("appDir:")+ appDir).toStdString().c_str());
     }
     else {
         // in regular application QCoreApplication::applicationDirPath() is preferred, see GitHub #1488
         appDir = QCoreApplication::applicationDirPath();
+        RS_DEBUG->print("%s\n", (QString("appDir2:")+ appDir).toStdString().c_str());
     }
 
     // when appDir is not HOME or CURRENT dir, search appDir too in getDirectoryList()
@@ -80,6 +88,15 @@ void RS_System::init(const QString& appName,
 }
 
 
+void RS_System::init(const QString& appName,
+                     const QString& appVersion,
+                     const QString& appDirName,
+                     const QString& arg0)
+{
+    init(appName, appVersion, appDirName, arg0.toLatin1().data());
+}
+
+
 /**
  * Initializes the list of available translations.
  */
@@ -88,7 +105,11 @@ void RS_System::initLanguageList() {
     QStringList lst = getFileList("qm", "qm");
 
     RS_SETTINGS->beginGroup("/Paths");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    lst += (RS_SETTINGS->readEntry("/Translations", "")).split(";", Qt::SkipEmptyParts);
+#else
     lst += (RS_SETTINGS->readEntry("/Translations", "")).split(";", QString::SkipEmptyParts);
+#endif
     RS_SETTINGS->endGroup();
 
     for (QStringList::Iterator it = lst.begin();
@@ -372,9 +393,9 @@ void RS_System::initAllLanguagesList() {
  *fixme, need to support command language
  */
 void RS_System::loadTranslation(const QString& lang, const QString& /*langCmd*/) {
-    static QTranslator* tQt = NULL;
-    static QTranslator* tLibreCAD = NULL;
-    static QTranslator* tPlugIns = NULL;
+    static QTranslator* tQt = nullptr;
+    static QTranslator* tLibreCAD = nullptr;
+    static QTranslator* tPlugIns = nullptr;
 
     //make translation filenames case insensitive, #276
     QString langLower("");
@@ -393,18 +414,22 @@ void RS_System::loadTranslation(const QString& lang, const QString& /*langCmd*/)
     QStringList lst = getDirectoryList( "qm");
 
     RS_SETTINGS->beginGroup( "/Paths");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    lst += (RS_SETTINGS->readEntry( "/Translations", "")).split( ";", Qt::SkipEmptyParts);
+#else
     lst += (RS_SETTINGS->readEntry( "/Translations", "")).split( ";", QString::SkipEmptyParts);
+#endif
     RS_SETTINGS->endGroup();
 
-    if( tLibreCAD != NULL) {
+    if( tLibreCAD != nullptr) {
         qApp->removeTranslator( tLibreCAD);
         delete tLibreCAD;
     }
-    if( tPlugIns != NULL) {
+    if( tPlugIns != nullptr) {
         qApp->removeTranslator( tPlugIns);
         delete tPlugIns;
     }
-    if( tQt != NULL) {
+    if( tQt != nullptr) {
         qApp->removeTranslator( tQt);
         delete tQt;
     }
@@ -420,7 +445,7 @@ void RS_System::loadTranslation(const QString& lang, const QString& /*langCmd*/)
          ++it) {
 
         // load LibreCAD translations
-        if (NULL == tLibreCAD) {
+        if (nullptr == tLibreCAD) {
             if (t->load( langFileLower, *it) == true
                     || (  ! langUpper.isEmpty()
                           && t->load( langFileUpper, *it) == true)) {
@@ -431,7 +456,7 @@ void RS_System::loadTranslation(const QString& lang, const QString& /*langCmd*/)
         }
 
         // load PlugIns translations
-        if (NULL == tPlugIns) {
+        if (nullptr == tPlugIns) {
             if (t->load( langPlugInsLower, *it) == true
                     || (  ! langUpper.isEmpty()
                           && t->load( langPlugInsUpper, *it) == true)) {
@@ -442,7 +467,7 @@ void RS_System::loadTranslation(const QString& lang, const QString& /*langCmd*/)
         }
 
         // load Qt standard dialog translations
-        if (NULL == tQt) {
+        if (nullptr == tQt) {
             if (t->load( langQtLower, *it) == true
                     || (  ! langUpper.isEmpty()
                           && t->load( langQtUpper, *it) == true)) {
@@ -451,11 +476,11 @@ void RS_System::loadTranslation(const QString& lang, const QString& /*langCmd*/)
                 t = new QTranslator(0);
             }
         }
-        if (NULL != tLibreCAD && NULL != tPlugIns && NULL != tQt) {
+        if (nullptr != tLibreCAD && nullptr != tPlugIns && nullptr != tQt) {
             break;
         }
     }
-    if (NULL != t) {
+    if (nullptr != t) {
         delete t;
     }
 }
@@ -504,6 +529,7 @@ QString RS_System::getAppDataDir() {
         if (!dir.mkpath( appData))
             return QString();
     }
+    RS_DEBUG->print("%s\n", (QString("appData: ") + appData).toStdString().c_str());
     return appData;
 }
 
@@ -538,11 +564,9 @@ QStringList RS_System::getFileList(const QString& subDirectory,
 
         if (dir.exists() && dir.isReadable()) {
             QStringList files = dir.entryList( QStringList( "*." + fileExtension));
-            for (QStringList::Iterator it2 = files.begin();
-                 it2 != files.end();
-                 it2++) {
-
-                fileList += path + "/" + (*it2);
+            for(QString& file: files)
+            {
+                fileList += path + "/" + file;
             }
         }
     }
@@ -561,12 +585,12 @@ QStringList RS_System::getDirectoryList(const QString& _subDirectory) {
     QString subDirectory = QDir::fromNativeSeparators( _subDirectory);
 
 #ifdef Q_OS_MAC
-    dirList.append( QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation) + "/" + appDirName + "/" + subDirectory);
+    dirList.append(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + appDirName + "/" + subDirectory);
 #endif // Q_OS_MAC
 
-#ifdef Q_OS_WIN32
-    dirList.append( QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation) + "/" + appDirName + "/" + subDirectory);
-#endif // Q_OS_WIN32
+#if (defined(Q_OS_WIN32) || defined(Q_OS_WIN64))
+    dirList.append(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + appDirName + "/" + subDirectory);
+#endif // Q_OS_WIN32 or Q_OS_WIN64
 
     // Unix home directory, it's old style but some people might have stuff there.
     dirList.append( getHomeDir() + "/." + appDirName + "/" + subDirectory);
@@ -580,22 +604,29 @@ QStringList RS_System::getDirectoryList(const QString& _subDirectory) {
         }
     }
 
-#ifdef Q_OS_UNIX
+    RS_DEBUG->print("%s\n", QString("%1(): line %2: dir=%3").arg(__func__).arg(__LINE__).arg(appDir).toStdString().c_str());
+
+#if (defined(Q_OS_WIN32) || defined(Q_OS_WIN64) || defined(Q_OS_UNIX))
     // for AppImage use relative paths from executable
     // from package manager the executable is in /usr/bin
     // in AppImage the executable is APPDIR/usr/bin
     // so this should work for package manager and AppImage distribution
     dirList.append( QDir::cleanPath( appDir + "/../share/doc/" + appDirName + "/" + subDirectory));
 
-    // Redhat style:
+    // try various locations for different Linux distributions
     dirList.append( QDir::cleanPath( appDir + "/../share/" + appDirName + "/" + subDirectory));
-    // Debian style:
+    dirList.append( QDir::cleanPath( appDir + "/../lib64/" + appDirName + "/" + subDirectory));
     dirList.append( QDir::cleanPath( appDir + "/../lib/" + appDirName + "/" + subDirectory));
 
     if (QStringLiteral( "plugins") == subDirectory) {
+        dirList.append( QDir::cleanPath( appDir + "/../lib64/" + appDirName));
         dirList.append( QDir::cleanPath( appDir + "/../lib/" + appDirName));
     }
 #endif
+    for (auto& dir: dirList) {
+
+        RS_DEBUG->print("%s\n", QString("%1(): line %2: dir=%3\n").arg(__func__).arg(__LINE__).arg(dir).toStdString().c_str());
+    }
 
 #ifdef Q_OS_MAC
     // Apple uses the resource directory
@@ -612,25 +643,32 @@ QStringList RS_System::getDirectoryList(const QString& _subDirectory) {
 
     // Individual directories:
     RS_SETTINGS->beginGroup( "/Paths");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    auto option = Qt::SkipEmptyParts;
+#else
+    auto option = QString::SkipEmptyParts;
+#endif
     if (subDirectory == "fonts") {
+        QString savedFonts = RS_SETTINGS->readEntry( "/Fonts", "");
+        RS_DEBUG->print("saved fonts: %s\n", savedFonts.toStdString().c_str());
         dirList += (RS_SETTINGS->readEntry( "/Fonts", "")).split( QRegExp("[;]"),
-                                                                  QString::SkipEmptyParts);
+                                                                  option);
     }
     else if (subDirectory == "patterns") {
         dirList += (RS_SETTINGS->readEntry( "/Patterns", "")).split( QRegExp("[;]"),
-                                                                     QString::SkipEmptyParts);
+                                                                  option);
     }
     else if (subDirectory.startsWith( "scripts")) {
         dirList += (RS_SETTINGS->readEntry( "/Scripts", "")).split( QRegExp("[;]"),
-                                                                    QString::SkipEmptyParts);
+                                                                  option);
     }
     else if (subDirectory.startsWith( "library")) {
         dirList += (RS_SETTINGS->readEntry( "/Library", "")).split( QRegExp("[;]"),
-                                                                    QString::SkipEmptyParts);
+                                                                  option);
     }
     else if (subDirectory.startsWith( "qm")) {
         dirList += (RS_SETTINGS->readEntry( "/Translations", "")).split( QRegExp("[;]"),
-                                                                         QString::SkipEmptyParts);
+                                                                  option);
     }
     RS_SETTINGS->endGroup();
 
@@ -642,8 +680,14 @@ QStringList RS_System::getDirectoryList(const QString& _subDirectory) {
          ++it ) {
         if (QFileInfo( *it).isDir()) {
             ret += (*it);
-            RS_DEBUG->print( (*it).toLatin1() );
+            RS_DEBUG->print(*it);
         }
+    }
+
+    for (auto& dir: ret) {
+
+
+        RS_DEBUG->print("%s\n", QString("%1(): line %2: dir=%3").arg(__func__).arg(__LINE__).arg(dir).toStdString().c_str());
     }
 
     return ret;

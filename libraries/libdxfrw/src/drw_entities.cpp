@@ -1105,7 +1105,7 @@ bool DRW_Insert::parseDwg(DRW::Version version, dwgBuffer *buf, duint32 bs){
             attH = buf->getHandle(); /* H 2 BLOCK HEADER (hard pointer) */
             DRW_DBG("second attrib Handle: "); DRW_DBGHL(attH.code, attH.size, attH.ref); DRW_DBG("\n");
         } else {
-            for (duint8 i=0; i< objCount; ++i){
+            for (dint32 i=0; i< objCount; ++i){
                 dwgHandle attH = buf->getHandle(); /* H 2 BLOCK HEADER (hard pointer) */
                 DRW_DBG("attrib Handle #"); DRW_DBG(i); DRW_DBG(": "); DRW_DBGHL(attH.code, attH.size, attH.ref); DRW_DBG("\n");
             }
@@ -1247,7 +1247,7 @@ bool DRW_LWPolyline::parseDwg(DRW::Version version, dwgBuffer *buf, duint32 bs){
                 vertex->y = buf->getDefaultDouble(pv->y);
             }
             pv = vertex;
-            vertlist.push_back(vertex);
+            vertlist.push_back(std::move(vertex));
         }
         //add bulges
         for (unsigned int i = 0; i < bulgesnum; i++){
@@ -2987,7 +2987,7 @@ bool DRW_Viewport::parseDwg(DRW::Version version, dwgBuffer *buf, duint32 bs){
         DRW_DBG("ViewPort ent header: "); DRW_DBGHL(someHdl.code, someHdl.size, someHdl.ref); DRW_DBG("\n");
     }
     if (version > DRW::AC1014) {//2000+
-        for (duint8 i=0; i < frozenLyCount; ++i){
+        for (duint32 i=0; i < frozenLyCount; ++i){
             someHdl = buf->getHandle();
             DRW_DBG("Frozen layer handle "); DRW_DBG(i); DRW_DBG(": "); DRW_DBGHL(someHdl.code, someHdl.size, someHdl.ref); DRW_DBG("\n");
         }

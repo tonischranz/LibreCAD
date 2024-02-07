@@ -25,9 +25,10 @@
 #ifndef LC_MAKERCAMSVG_H
 #define LC_MAKERCAMSVG_H
 
-#include <string>
 #include <memory>
+#include <string>
 
+#include "rs.h"
 #include "rs_vector.h"
 
 class RS_Arc;
@@ -56,7 +57,7 @@ class RS_Graphic;
 
 class LC_MakerCamSVG {
 public:
-	LC_MakerCamSVG(LC_XMLWriterInterface* xmlWriter,
+    LC_MakerCamSVG(std::unique_ptr<LC_XMLWriterInterface> xmlWriter,
                    bool writeInvisibleLayers = true,
                    bool writeConstructionLayers = true,
                    bool writeBlocksInline = false,

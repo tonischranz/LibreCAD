@@ -1,28 +1,25 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2011-03-22T19:33:11
+# Project created manually on 2023-10-30T19:53:00
 #
 #-------------------------------------------------
 
 QT       += gui
 TEMPLATE = lib
 CONFIG += plugin
-VERSION = 1.0.0
-TARGET = $$qtLibraryTarget(importshp)
+VERSION = 1.0.1
+TARGET = $$qtLibraryTarget(pointstocsv)
 
-GENERATED_DIR = ../../generated/plugin/importshp
+GENERATED_DIR = ../../generated/plugin/pointstocsv
 # Use common project definitions.
 include(../../common.pri)
 
 # For plugins
 INCLUDEPATH    += ../../librecad/src/plugins
 
-SOURCES += importshp.cpp \
-           shapelib/shpopen.c \
-           shapelib/safileio.c \
-           shapelib/dbfopen.c
-HEADERS += importshp.h \
-           shapelib/shapefil.h
+SOURCES += pointstocsv.cpp
+
+HEADERS += pointstocsv.h
 
 # Installation Directory
 win32 {
@@ -37,4 +34,3 @@ unix {
     }
 }
 
-INCLUDEPATH    += shapelib

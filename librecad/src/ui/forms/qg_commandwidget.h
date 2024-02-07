@@ -28,16 +28,20 @@
 
 #include "ui_qg_commandwidget.h"
 class QG_ActionHandler;
+class QAction;
 
 class QG_CommandWidget : public QWidget, public Ui::QG_CommandWidget
 {
     Q_OBJECT
 
 public:
-    QG_CommandWidget(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = 0);
+    QG_CommandWidget(QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags fl = {});
     ~QG_CommandWidget();
 
-    virtual bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    QAction* getDockingAction() const {
+        return m_docking;
+    }
 
 public slots:
     virtual void setFocus();
@@ -50,15 +54,19 @@ public slots:
     virtual void setActionHandler( QG_ActionHandler * ah );
     virtual void setCommandMode();
     virtual void setNormalMode();
-	static QString getRootCommand( const QStringList & cmdList, const QString & typed );
+    static QString getRootCommand( const QStringList & cmdList, const QString & typed );
     void setKeycodeMode(bool state);
 
 protected slots:
     virtual void languageChange();
     virtual void chooseCommandFile();
 
+private slots:
+    virtual void dockingButtonTriggered(bool);
+
 private:
-    QG_ActionHandler* actionHandler;
+    QG_ActionHandler* actionHandler = nullptr;
+    QAction* m_docking = nullptr;
 };
 
 #endif // QG_COMMANDWIDGET_H

@@ -46,7 +46,7 @@ RS_ActionModifyMirror::RS_ActionModifyMirror(RS_EntityContainer& container,
         RS_GraphicView& graphicView)
         :RS_PreviewActionInterface("Mirror Entities",
                                    container, graphicView)
-        , pPoints(new Points{})
+        , pPoints(std::make_unique<Points>())
 {
     actionType=RS2::ActionModifyMirror;
 }
@@ -83,7 +83,7 @@ void RS_ActionModifyMirror::mouseMoveEvent(QMouseEvent* e) {
         case SetAxisPoint2:
             if (pPoints->axisPoint1.valid) {
                 if(e->modifiers() & Qt::ShiftModifier)
-                    mouse = snapToAngle(mouse, pPoints->axisPoint1, 15.);
+                    mouse = snapToAngle(mouse, pPoints->axisPoint1);
 
                 pPoints->axisPoint2 = mouse;
 
@@ -111,7 +111,7 @@ void RS_ActionModifyMirror::mouseReleaseEvent(QMouseEvent* e) {
     if (e->button()==Qt::LeftButton) {
         RS_Vector snapped = snapPoint(e);
         if((e->modifiers() & Qt::ShiftModifier) && getStatus() == SetAxisPoint2 )
-            snapped = snapToAngle(snapped, pPoints->axisPoint1, 15.);
+            snapped = snapToAngle(snapped, pPoints->axisPoint1);
 
         RS_CoordinateEvent ce(snapped);
         coordinateEvent(&ce);

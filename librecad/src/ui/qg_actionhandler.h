@@ -177,6 +177,7 @@ public slots:
 	void slotDimRadial();
 	void slotDimDiametric();
 	void slotDimAngular();
+	void slotDimArc();
 	void slotDimLeader();
 
 	void slotModifyAttributes();
@@ -241,6 +242,8 @@ public slots:
 	void slotLayersToggleLock();
 	void slotLayersTogglePrint();
 	void slotLayersToggleConstruction();
+    void slotLayersExportSelected();
+    void slotLayersExportVisible();
 
 	void slotBlocksDefreezeAll();
 	void slotBlocksFreezeAll();
@@ -259,6 +262,7 @@ public slots:
     void toggleLock(RS_Layer* layer);
     void togglePrint(RS_Layer* layer);
     void toggleConstruction(RS_Layer* layer);
+    void slotRedockWidgets();
 private:
 
 	// Type of draw order selected command

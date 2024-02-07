@@ -139,7 +139,7 @@ void RS_ActionDrawLine::trigger()
 
     graphicView->redraw(RS2::RedrawDrawing);
     graphicView->moveRelativeZero(pPoints->history.at(pPoints->index()).currPt);
-    RS_DEBUG->print("RS_ActionDrawLine::trigger(): line added: %d",
+    RS_DEBUG->print("RS_ActionDrawLine::trigger(): line added: %lu",
                     line->getId());
 }
 
@@ -149,7 +149,7 @@ void RS_ActionDrawLine::mouseMoveEvent(QMouseEvent* e)
     if (getStatus() == SetEndpoint && pPoints->data.startpoint.valid) {
         // Snapping to angle(15*) if shift key is pressed
         if (e->modifiers() & Qt::ShiftModifier) {
-            mouse = snapToAngle(mouse, pPoints->data.startpoint, 15.);
+            mouse = snapToAngle(mouse, pPoints->data.startpoint);
         }
 
         deletePreview();
@@ -169,7 +169,7 @@ void RS_ActionDrawLine::mouseReleaseEvent(QMouseEvent* e)
         // Snapping to angle(15*) if shift key is pressed
         if ((e->modifiers() & Qt::ShiftModifier)
             && getStatus() == SetEndpoint ) {
-            snapped = snapToAngle(snapped, pPoints->data.startpoint, 15.);
+            snapped = snapToAngle(snapped, pPoints->data.startpoint);
         }
 
         RS_CoordinateEvent ce(snapped);

@@ -27,14 +27,19 @@ CONFIG += qt \
     depend_includepath
 
 QT += widgets printsupport
-CONFIG += c++11
+CONFIG += c++17
 *-g++ {
     QMAKE_CXXFLAGS += -fext-numeric-literals
 }
 
 GEN_LIB_DIR = ../../generated/lib
-PRE_TARGETDEPS += $$GEN_LIB_DIR/libdxfrw.a \
-		$$GEN_LIB_DIR/libjwwlib.a
+msvc {
+	PRE_TARGETDEPS += $$GEN_LIB_DIR/dxfrw.lib \
+			$$GEN_LIB_DIR/jwwlib.lib
+} else {
+	PRE_TARGETDEPS += $$GEN_LIB_DIR/libdxfrw.a \
+			$$GEN_LIB_DIR/libjwwlib.a
+}
 
 DESTDIR = $${INSTALLDIR}
 
@@ -126,6 +131,7 @@ HEADERS += \
     lib/actions/rs_snapper.h \
     lib/creation/rs_creation.h \
     lib/debug/rs_debug.h \
+    lib/engine/lc_looputils.h \
     lib/engine/rs.h \
     lib/engine/rs_arc.h \
     lib/engine/rs_atomicentity.h \
@@ -142,6 +148,7 @@ HEADERS += \
     lib/engine/rs_dimension.h \
     lib/engine/rs_dimlinear.h \
     lib/engine/rs_dimradial.h \
+    lib/engine/lc_dimarc.h \
     lib/engine/rs_document.h \
     lib/engine/rs_ellipse.h \
     lib/engine/rs_entity.h \
@@ -210,6 +217,7 @@ HEADERS += \
     lib/math/rs_math.h \
     lib/math/lc_quadratic.h \
     actions/lc_actiondrawcircle2pr.h \
+    main/console_dxf2png.h \
     test/lc_simpletests.h \
     lib/generators/lc_makercamsvg.h \
     lib/generators/lc_xmlwriterinterface.h \
@@ -228,6 +236,7 @@ SOURCES += \
     lib/actions/rs_snapper.cpp \
     lib/creation/rs_creation.cpp \
     lib/debug/rs_debug.cpp \
+    lib/engine/lc_looputils.cpp \
     lib/engine/rs_arc.cpp \
     lib/engine/rs_block.cpp \
     lib/engine/rs_blocklist.cpp \
@@ -240,6 +249,7 @@ SOURCES += \
     lib/engine/rs_dimension.cpp \
     lib/engine/rs_dimlinear.cpp \
     lib/engine/rs_dimradial.cpp \
+    lib/engine/lc_dimarc.cpp \
     lib/engine/rs_document.cpp \
     lib/engine/rs_ellipse.cpp \
     lib/engine/rs_entity.cpp \
@@ -298,6 +308,7 @@ SOURCES += \
     lib/engine/rs_color.cpp \
     lib/engine/rs_pen.cpp \
     actions/lc_actiondrawcircle2pr.cpp \
+    main/console_dxf2png.cpp \
     test/lc_simpletests.cpp \
     lib/generators/lc_xmlwriterqxmlstreamwriter.cpp \
     lib/generators/lc_makercamsvg.cpp \
@@ -337,6 +348,7 @@ HEADERS += actions/rs_actionblocksadd.h \
     actions/rs_actiondimleader.h \
     actions/rs_actiondimlinear.h \
     actions/rs_actiondimradial.h \
+    actions/lc_actiondimarc.h \
     actions/rs_actiondrawarc.h \
     actions/rs_actiondrawarc3p.h \
     actions/rs_actiondrawarctangential.h \
@@ -399,6 +411,7 @@ HEADERS += actions/rs_actionblocksadd.h \
     actions/rs_actionlayerstoggleview.h \
     actions/rs_actionlayerstoggleprint.h \
     actions/lc_actionlayerstoggleconstruction.h \
+    actions/lc_actionlayersexport.h \
     actions/rs_actionlibraryinsert.h \
     actions/rs_actionlockrelativezero.h \
     actions/rs_actionmodifyattributes.h \
@@ -472,6 +485,7 @@ SOURCES += actions/rs_actionblocksadd.cpp \
     actions/rs_actiondimleader.cpp \
     actions/rs_actiondimlinear.cpp \
     actions/rs_actiondimradial.cpp \
+    actions/lc_actiondimarc.cpp \
     actions/rs_actiondrawarc.cpp \
     actions/rs_actiondrawarc3p.cpp \
     actions/rs_actiondrawarctangential.cpp \
@@ -534,6 +548,7 @@ SOURCES += actions/rs_actionblocksadd.cpp \
     actions/rs_actionlayerstoggleview.cpp \
     actions/rs_actionlayerstoggleprint.cpp \
     actions/lc_actionlayerstoggleconstruction.cpp \
+    actions/lc_actionlayersexport.cpp \
     actions/rs_actionlibraryinsert.cpp \
     actions/rs_actionlockrelativezero.cpp \
     actions/rs_actionmodifyattributes.cpp \
@@ -696,7 +711,8 @@ HEADERS += ui/lc_actionfactory.h \
     ui/generic/colorcombobox.h \
     ui/generic/colorwizard.h \
     ui/lc_penwizard.h \
-    ui/generic/textfileviewer.h
+    ui/generic/textfileviewer.h \
+    ui/lc_filedialogservice.h
 
 SOURCES += ui/lc_actionfactory.cpp \
     ui/qg_actionhandler.cpp \
@@ -799,7 +815,8 @@ SOURCES += ui/lc_actionfactory.cpp \
     ui/generic/colorcombobox.cpp \
     ui/generic/colorwizard.cpp \
     ui/lc_penwizard.cpp \
-    ui/generic/textfileviewer.cpp
+    ui/generic/textfileviewer.cpp \
+    ui/lc_filedialogservice.cpp
 
 FORMS = ui/forms/qg_commandwidget.ui \
     ui/forms/qg_arcoptions.ui \
